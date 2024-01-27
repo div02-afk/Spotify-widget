@@ -3,7 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
-
+const mediaController = require('node-media-controller');
 
 function createWindow(): void {
   // Create the browser window.
@@ -69,19 +69,40 @@ app.whenReady().then(() => {
   ipcMain.on('ping', () => console.log('pong'))
   ipcMain.on('play', () => {
     // Send an IPC message to the renderer process to play the media
+    mediaController.executeCommand("play", function(err:any, result:any) {
+      if(!err) {
+        console.log('done!');
+      }
+  
+  });
    
   })
   ipcMain.on('pause', () => {
     // Send an IPC message to the renderer process to play the media
-    
+    mediaController.executeCommand('pause', function(err:any, result:any) {
+      if(!err) {
+        console.log('done!');
+      }
+  
+  });
   })
   ipcMain.on('next', () => {
     // Send an IPC message to the renderer process to play the media
-    mainWindow.webContents.send('next')
+    mediaController.executeCommand('next', function(err:any, result:any) {
+      if(!err) {
+        console.log('done!');
+      }
+  
+  });
   })
   ipcMain.on('previous', () => {
     // Send an IPC message to the renderer process to play the media
-    mainWindow.webContents.send('previous')
+    mediaController.executeCommand('previous', function(err:any, result:any) {
+      if(!err) {
+        console.log('done!');
+      }
+  
+  });
   })
 
   createWindow()

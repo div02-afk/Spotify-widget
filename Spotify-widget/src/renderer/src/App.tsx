@@ -4,7 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleChevronLeft, faCircleChevronRight ,faCirclePlay, faCirclePause} from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
 
+
 const control = (command: string) => {
+  
   window.electron.ipcRenderer.send(command)
 }
 function App(): JSX.Element {
