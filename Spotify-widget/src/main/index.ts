@@ -1,9 +1,9 @@
-import { app, shell, BrowserWindow, ipcMain,screen } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
-const mediaController = require('node-media-controller');
+const mediaController = require('node-media-controller')
 
 function createWindow(): void {
   // Create the browser window.
@@ -12,14 +12,15 @@ function createWindow(): void {
     height: 80,
     show: false,
     frame: false,
+    roundedCorners: true,
     resizable: false,
     x: screen.getPrimaryDisplay().workAreaSize.width - 310,
     y: screen.getPrimaryDisplay().workAreaSize.height - 90,
     skipTaskbar: true,
     alwaysOnTop: true,
     transparent: true,
-    
-    closable: false,
+
+    closable: true,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -27,6 +28,8 @@ function createWindow(): void {
       sandbox: false
     }
   })
+
+  
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -37,7 +40,6 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -46,8 +48,6 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
-
-
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -64,45 +64,53 @@ app.whenReady().then(() => {
   })
 
   // IPC test
-  
 
   ipcMain.on('ping', () => console.log('pong'))
   ipcMain.on('play', () => {
-    // Send an IPC message to the renderer process to play the media
-    mediaController.executeCommand("play", function(err:any, result:any) {
-      if(!err) {
-        console.log('done!');
+    const { exec } = require('child_process')
+
+    exec('python get_media_info.py', (error, stdout, stderr) => {
+      if (error) {
+        console.log(`error: ${error.message}`)
+        return
       }
-  
-  });
-   
+      if (stderr) {
+        console.log(`stderr: ${stderr}`)
+        return
+      }
+      console.log(`stdout: ${stdout}`)
+    })
+
+    // Send an IPC message to the renderer process to play the media
+    mediaController.executeCommand('play', function (err: any, result: any) {
+      if (!err) {
+        console.log('done!')
+      }
+    })
   })
   ipcMain.on('pause', () => {
     // Send an IPC message to the renderer process to play the media
-    mediaController.executeCommand('pause', function(err:any, result:any) {
-      if(!err) {
-        console.log('done!');
+    mediaController.executeCommand('pause', function (err: any, result: any) {
+      if (!err) {
+        console.log('done!')
       }
-  
-  });
+    })
   })
   ipcMain.on('next', () => {
     // Send an IPC message to the renderer process to play the media
-    mediaController.executeCommand('next', function(err:any, result:any) {
-      if(!err) {
-        console.log('done!');
+    mediaController.executeCommand('next', function (err: any, result: any) {
+      if (!err) {
+        console.log('done!')
       }
-  
-  });
+    })
   })
   ipcMain.on('previous', () => {
     // Send an IPC message to the renderer process to play the media
-    mediaController.executeCommand('previous', function(err:any, result:any) {
-      if(!err) {
-        console.log('done!');
+    mediaController.executeCommand('previous', function (err: any, result: any) {
+      if (!err) {
+        console.log('done!')
       }
-  
-  });
+    })
   })
 
   createWindow()
