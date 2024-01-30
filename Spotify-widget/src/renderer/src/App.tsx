@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
 import {
   faCircleChevronLeft,
   faCircleChevronRight,
@@ -8,14 +9,18 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
 import './assets/base.css'
-
+import store from './components/store'
 const control = (command: string) => {
   window.electron.ipcRenderer.send(command)
 }
 function App(): JSX.Element {
+  
   // const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-
-  const [isPlaying, setIsPlaying] = useState(false)
+  const loggedIn = store.getState().loggedin
+  const songName = store.getState().songName
+  // const albumName = store.getState().album
+  // const artistName = store.getState().artist
+  const [isPlaying, setIsPlaying] = useState(store.getState().isPlaying);
   const nowPlaying = 'Now Playing'
   const playPauseMedia = () => {
     if (isPlaying) {
@@ -26,6 +31,7 @@ function App(): JSX.Element {
     setIsPlaying(!isPlaying)
   }
   const nextMedia = () => {
+    setIsPlaying(true)
     control('next')
     console.log('next')
   }
@@ -34,9 +40,13 @@ function App(): JSX.Element {
     console.log('previous')
   }
   return (
-    <div className="w-screen h-screen  text-white glass">
+    <div className="w-screen h-screen  text-white glass rounded-full">
       <div className=" opacity-100 text-center  flex-row ">
-        <div className="">{nowPlaying}</div>
+        <div className="flex gap-6 justify-center">
+          <div>{loggedIn?songName:nowPlaying}</div> 
+          {!loggedIn &&<div onClick={()=>control('login')}>login</div>}
+        </div>
+
         <div className="text-4xl flex gap-6 text-center justify-center">
           <motion.div
             className="w-10"
