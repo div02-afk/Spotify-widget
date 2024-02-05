@@ -9,18 +9,18 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
 import './assets/base.css'
-import store from './components/store'
+import store from './components/store';
 const control = (command: string) => {
   window.electron.ipcRenderer.send(command)
 }
 function App(): JSX.Element {
   
   // const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-  const loggedIn = store.getState().loggedin
-  const songName = store.getState().songName
-  // const albumName = store.getState().album
+  const loggedIn = false;
+  const songName = '';
+  const albumName = store.getState().album
   // const artistName = store.getState().artist
-  const [isPlaying, setIsPlaying] = useState(store.getState().isPlaying);
+  const [isPlaying, setIsPlaying] = useState(false);
   const nowPlaying = 'Now Playing'
   const playPauseMedia = () => {
     if (isPlaying) {

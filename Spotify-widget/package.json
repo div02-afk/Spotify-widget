@@ -33,7 +33,8 @@
     "framer-motion": "^11.0.3",
     "immer": "^10.0.3",
     "node-media-controller": "^0.0.6",
-    "querystring": "^0.2.1"
+    "querystring": "^0.2.1",
+    "reduxtron": "^0.0.9"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",

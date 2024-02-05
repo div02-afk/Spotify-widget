@@ -1,8 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-
-import store from './store'
+import { store } from 'renderer/src/components/store'
 import icon from '../../resources/icon.png?asset'
 
 const express = require('express')
@@ -13,7 +12,6 @@ const expressApp = express()
 const mediaController = require('node-media-controller')
 
 function createWindow(): void {
-  
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 300,
@@ -37,8 +35,7 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
-      
+      sandbox: false
     }
   })
 
@@ -50,7 +47,7 @@ function createWindow(): void {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
-  
+
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -114,7 +111,6 @@ app.whenReady().then(() => {
   ipcMain.on('login', () => {
     loginWithSpotify()
   })
-  
 
   createWindow()
 
@@ -161,12 +157,12 @@ expressApp.get('/callback', async (req: any, res: any) => {
 
     // Retrieve access token and refresh token
     const { access_token, refresh_token } = data
-      store.dispatch({type:'accessToken' ,payload:access_token});
-      store.dispatch({type:'refreshToken',payload: refresh_token});
+    store.dispatch({ type: 'accessToken', payload: access_token })
+    store.dispatch({ type: 'refreshToken', payload: refresh_token })
     // Send the tokens to the renderer process (mainWindow)
     // event.sender.send('spotify-auth-reply', access_token);
     res.send('You can close this window now')
-    store.dispatch({type:'loggedin'});
+    store.dispatch({ type: 'loggedin' })
   } catch (error: any) {
     // Log and handle the error
     console.error('Error exchanging authorization code for access token:', error.message)
@@ -201,15 +197,15 @@ function loginWithSpotify() {
 // }
 function getCurrentlyPlayingTrack(): void {
   interface songInfo {
-    name: string;
-    artist: Array<string>;
-    album: string;
-    isplaying: boolean;
-    image: Array<string>;
+    name: string
+    artist: Array<string>
+    album: string
+    isplaying: boolean
+    image: Array<string>
   }
-  const access_token = store.getState().accessToken;
-  
-  if(access_token === '') return;
+  const access_token = store.getState().accessToken
+
+  if (access_token === '') return
   if (access_token) {
     let accessToken = access_token
     const currentlyPlayingEndpoint = 'https://api.spotify.com/v1/me/player/currently-playing'
@@ -224,7 +220,7 @@ function getCurrentlyPlayingTrack(): void {
       .then((response) => {
         // Handle successful response
         // console.log('Currently Playing:', response.data)
-        const info = response.data;
+        const info = response.data
         const data: songInfo = {
           name: info.item.name,
           artist: info.item.artists,
@@ -232,14 +228,18 @@ function getCurrentlyPlayingTrack(): void {
           isplaying: info.is_playing,
           image: info.item.album.images
         }
-        // store.dispatch({type:'songInfo',payload: data});
-        console.log(data);
+        store.dispatch({ type: 'songInfo', payload: data })
+        // console.log(dyata);
         // Extract relevant information such as track name, artist, album, etc. from the response
       })
       .catch((error) => {
         // Handle error
-        console.error('Error fetching currently playing track:',error)
+        console.error('Error fetching currently playing track:', error)
       })
   }
 }
-const interval = setInterval(getCurrentlyPlayingTrack, 5000);
+const interval = setInterval(getCurrentlyPlayingTrack, 5000)
+
+store.subscribe(() => {
+  console.log(store.getState())
+})
