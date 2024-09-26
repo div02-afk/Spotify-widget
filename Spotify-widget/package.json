@@ -29,7 +29,7 @@
     "axios": "^1.6.7",
     "electron-redux": "^1.5.4",
     "electron-updater": "^6.1.7",
-    "express": "^4.18.2",
+    "express": "^4.21.0",
     "framer-motion": "^11.0.3",
     "immer": "^10.0.3",
     "node-media-controller": "^0.0.6",
